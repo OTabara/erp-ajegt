@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { createFinancialTransaction, fetchFinancialTransactions } from "../api/financialTransactions";
-import type { FinancialTransactionDraft, FinancialTransactionType } from "../api/financialTransactions";
+import type { FinancialTransaction, FinancialTransactionDraft, FinancialTransactionType } from "../api/financialTransactions";
 import { fetchContributions } from "../api/contributions";
 import type { Contribution } from "../api/contributions";
 import type { PaymentMethod } from "../api/contributions";
@@ -13,6 +13,8 @@ const methods: { value: PaymentMethod; label: string }[] = [
   { value: "CASH", label: "Espèces" }, { value: "BANK_TRANSFER", label: "Virement" },
   { value: "CHEQUE", label: "Chèque" }, { value: "OTHER", label: "Autre" },
 ];
+const paymentMethodLabel = (value: PaymentMethod) => methods.find(method => method.value === value)?.label ?? "Autre";
+const csvCell = (value: string | number) => `"${String(value).replaceAll('"', '""')}"`;
 
 export default function FinanceTransactions() {
   const [year, setYear] = useState(currentYear);
@@ -55,6 +57,29 @@ export default function FinanceTransactions() {
   }, { INCOME: 0, EXPENSE: 0 }), [rows]);
   const balance = totals.INCOME - totals.EXPENSE;
 
+  function exportCsv() {
+    const csvRows: (string | number)[][] = [
+      ["Bilan financier AJEGT", year],
+      ["Recettes, cotisations incluses (€)", totals.INCOME.toFixed(2).replace(".", ",")],
+      ["Dépenses (€)", totals.EXPENSE.toFixed(2).replace(".", ",")],
+      ["Solde (€)", balance.toFixed(2).replace(".", ",")],
+      [],
+      ["Type", "Catégorie", "Libellé", "Montant (€)", "Date", "Mode de paiement"],
+      ...rows.map(item => [
+        item.type === "INCOME" ? "Recette" : "Dépense", item.category, item.description,
+        `${item.type === "EXPENSE" ? "-" : ""}${item.amount.toFixed(2).replace(".", ",")}`,
+        item.transactionDate, paymentMethodLabel(item.paymentMethod),
+      ]),
+    ];
+    const content = `\uFEFF${csvRows.map(row => row.map(csvCell).join(";")).join("\r\n")}`;
+    const url = URL.createObjectURL(new Blob([content], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `bilan-financier-ajegt-${year}.csv`;
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError(""); setNotice(""); setSaving(true);
     const draft: FinancialTransactionDraft = { type, category: category.trim(), description: description.trim(), amount: Number(amount), transactionDate, paymentMethod, periodYear: year };
@@ -68,9 +93,10 @@ export default function FinanceTransactions() {
   }
 
   return <>
-    <div className="page-heading"><div><div className="eyebrow">TRÉSORERIE</div><h1>Recettes et dépenses</h1><p>Suivez les entrées et sorties de fonds de l’association.</p></div>
-      <label className="contribution-year">Année<select value={year} onChange={event => setYear(Number(event.target.value))}>{Array.from({ length: 7 }, (_, index) => currentYear + 1 - index).map(value => <option key={value}>{value}</option>)}</select></label>
+    <div className="page-heading no-print"><div><div className="eyebrow">TRÉSORERIE</div><h1>Recettes et dépenses</h1><p>Suivez les entrées et sorties de fonds de l’association.</p></div>
+      <div className="finance-report-actions"><label className="contribution-year">Année<select value={year} onChange={event => setYear(Number(event.target.value))}>{Array.from({ length: 7 }, (_, index) => currentYear + 1 - index).map(value => <option key={value}>{value}</option>)}</select></label><button className="button button-secondary" disabled={loading || Boolean(error)} onClick={exportCsv}>Exporter CSV</button><button className="button button-primary" disabled={loading || Boolean(error)} onClick={() => window.print()}>Imprimer / PDF</button></div>
     </div>
+    <header className="finance-report-header print-only"><div className="eyebrow">AJEGT · TRÉSORERIE</div><h1>Bilan financier {year}</h1><p>Association des Jeunes et Étudiants Guinéens de Toulouse</p><small>Généré le {new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(new Date())}</small></header>
     <div className="contribution-stats finance-summary" aria-label="Résumé financier annuel">
       <div className="stat-card"><span className="stat-icon stat-icon-green" aria-hidden="true">↙</span><span className="stat-copy"><span>Recettes</span><strong>{formatAmount(totals.INCOME)}</strong></span><span className="stat-caption">en {year}</span></div>
       <div className="stat-card"><span className="stat-icon stat-icon-sand" aria-hidden="true">↗</span><span className="stat-copy"><span>Dépenses</span><strong>{formatAmount(totals.EXPENSE)}</strong></span><span className="stat-caption">en {year}</span></div>
@@ -79,7 +105,7 @@ export default function FinanceTransactions() {
     {error && <div className="page-error" role="alert"><span>{error}</span><button className="button button-secondary" onClick={() => void reload()}>Réessayer</button></div>}
     {notice && <p className="profile-notice" role="status">{notice}</p>}
     <div className="contribution-layout">
-      <section className="members-panel contribution-form-panel"><div className="panel-heading"><div><h2>Enregistrer une opération</h2><p>Ajoutez une recette ou une dépense.</p></div></div>
+      <section className="members-panel contribution-form-panel no-print"><div className="panel-heading"><div><h2>Enregistrer une opération</h2><p>Ajoutez une recette ou une dépense.</p></div></div>
         <form className="contribution-form" onSubmit={event => void submit(event)}>
           <label>Type<select value={type} onChange={event => setType(event.target.value as FinancialTransactionType)}><option value="INCOME">Recette</option><option value="EXPENSE">Dépense</option></select></label>
           <label>Catégorie<input required maxLength={60} value={category} onChange={event => setCategory(event.target.value)} placeholder={type === "INCOME" ? "Ex. Don, subvention" : "Ex. Transport, matériel"} /></label>
@@ -91,7 +117,7 @@ export default function FinanceTransactions() {
         </form>
       </section>
       <section className="members-panel contribution-history"><div className="panel-heading"><div><h2>Journal financier</h2><p>{rows.length} opération{rows.length === 1 ? "" : "s"} en {year}</p></div></div>
-        {loading ? <div className="empty-state"><strong>Chargement…</strong></div> : rows.length === 0 ? <div className="empty-state"><span>€</span><strong>Aucune opération cette année</strong><p>Les recettes, cotisations et dépenses apparaîtront ici.</p></div> : <div className="table-scroll"><table className="members-table"><thead><tr><th>Type</th><th>Catégorie et libellé</th><th>Montant</th><th>Date</th><th>Mode</th></tr></thead><tbody>{rows.map(item => <tr key={item.id}><td><span className={`status-pill ${item.type === "INCOME" ? "active" : "archived"}`}>{item.type === "INCOME" ? "Recette" : "Dépense"}</span></td><td><div className="member-name"><strong>{item.category}</strong><small>{item.description}</small></div></td><td><strong>{item.type === "EXPENSE" ? "−" : "+"}{formatAmount(item.amount)}</strong></td><td>{new Intl.DateTimeFormat("fr-FR").format(new Date(`${item.transactionDate}T12:00:00`))}</td><td>{methods.find(method => method.value === item.paymentMethod)?.label ?? "Autre"}</td></tr>)}</tbody></table></div>}
+        {loading ? <div className="empty-state"><strong>Chargement…</strong></div> : rows.length === 0 ? <div className="empty-state"><span>€</span><strong>Aucune opération cette année</strong><p>Les recettes, cotisations et dépenses apparaîtront ici.</p></div> : <div className="table-scroll"><table className="members-table"><thead><tr><th>Type</th><th>Catégorie et libellé</th><th>Montant</th><th>Date</th><th>Mode</th></tr></thead><tbody>{rows.map(item => <tr key={item.id}><td><span className={`status-pill ${item.type === "INCOME" ? "active" : "archived"}`}>{item.type === "INCOME" ? "Recette" : "Dépense"}</span></td><td><div className="member-name"><strong>{item.category}</strong><small>{item.description}</small></div></td><td><strong>{item.type === "EXPENSE" ? "−" : "+"}{formatAmount(item.amount)}</strong></td><td>{new Intl.DateTimeFormat("fr-FR").format(new Date(`${item.transactionDate}T12:00:00`))}</td><td>{paymentMethodLabel(item.paymentMethod)}</td></tr>)}</tbody></table></div>}
       </section>
     </div>
   </>;
