@@ -15,43 +15,8 @@ export type MemberDraft = Omit<Member, "id" | "status">;
 
 type ApiMember = Omit<Member, "status"> & { status: "ACTIVE" | "ARCHIVED" };
 
-const API_URL = (import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8080").replace(/\/$/, "");
-
-export class ApiError extends Error {
-  readonly status?: number;
-
-  constructor(message: string, status?: number) {
-    super(message);
-    this.name = "ApiError";
-    this.status = status;
-  }
-}
-
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  let response: Response;
-  try {
-    response = await fetch(`${API_URL}${path}`, {
-      ...init,
-      headers: { Accept: "application/json", ...(init?.body ? { "Content-Type": "application/json" } : {}), ...init?.headers },
-    });
-  } catch {
-    throw new ApiError("Impossible de joindre le serveur. Vérifiez que le backend est démarré.");
-  }
-
-  if (!response.ok) {
-    let message = `La requête a échoué (${response.status}).`;
-    try {
-      const problem = await response.json() as { detail?: string; message?: string };
-      message = problem.detail ?? problem.message ?? message;
-    } catch {
-      // Keep the readable HTTP fallback when the server returned no JSON body.
-    }
-    throw new ApiError(message, response.status);
-  }
-
-  if (response.status === 204) return undefined as T;
-  return response.json() as Promise<T>;
-}
+import { apiRequest as request } from "./http";
+export { ApiError } from "./http";
 
 function fromApi(member: ApiMember): Member {
   return { ...member, status: member.status === "ACTIVE" ? "active" : "archived" };
