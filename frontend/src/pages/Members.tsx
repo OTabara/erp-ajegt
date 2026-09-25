@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { ApiError, createMember, fetchMembers, setMemberStatus, updateMember } from "../api/members";
 import type { Member, MemberDraft } from "../api/members";
+import { useAuth } from "../auth/useAuth";
 
 const roles = ["Membre", "Présidence", "Secrétariat", "Trésorerie", "Bureau"];
 const filters = [
@@ -29,6 +30,8 @@ function formatDate(value: string) {
 }
 
 export default function Members() {
+  const { user } = useAuth();
+  const canManageMembers = user?.role === "SECRETARY" || user?.role === "ADMIN";
   const [members, setMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -72,6 +75,7 @@ export default function Members() {
   }, [members, filter, query]);
 
   function openCreateModal() {
+    if (!canManageMembers) return;
     setEditingId(null);
     setDraft({ ...emptyDraft, joinedAt: new Date().toISOString().slice(0, 10) });
     setError("");
@@ -79,6 +83,7 @@ export default function Members() {
   }
 
   function openEditModal(member: Member) {
+    if (!canManageMembers) return;
     setEditingId(member.id);
     setDraft({
       firstName: member.firstName,
@@ -111,6 +116,7 @@ export default function Members() {
 
   async function saveMember(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!canManageMembers) return;
     const normalizedEmail = draft.email.trim().toLocaleLowerCase("fr-FR");
     if (members.some((member) => member.email.toLocaleLowerCase("fr-FR") === normalizedEmail && member.id !== editingId)) {
       setError("Cette adresse e-mail est déjà associée à un membre.");
@@ -142,6 +148,7 @@ export default function Members() {
   }
 
   async function toggleArchive(member: Member) {
+    if (!canManageMembers) return;
     setPageError("");
     try {
       const updated = await setMemberStatus(member.id, member.status === "active" ? "archived" : "active");
@@ -157,11 +164,11 @@ export default function Members() {
         <div>
           <div className="eyebrow">VIE ASSOCIATIVE</div>
           <h1>Les membres</h1>
-          <p>Retrouvez et gérez les membres de l’association.</p>
+          <p>{canManageMembers ? "Consultez et gérez les dossiers des membres." : "Consultez l’annuaire des membres de l’association."}</p>
         </div>
-        <button className="button button-primary" onClick={openCreateModal}>
+        {canManageMembers && <button className="button button-primary" onClick={openCreateModal}>
           <span aria-hidden="true">＋</span> Ajouter un membre
-        </button>
+        </button>}
       </div>
 
       <div className="prototype-banner" role="note">
@@ -200,7 +207,7 @@ export default function Members() {
         <div className="panel-heading">
           <div>
             <h2 id="members-list-title">Annuaire</h2>
-            <p>Consultez les dossiers et mettez-les à jour.</p>
+            <p>{canManageMembers ? "Consultez les dossiers et mettez-les à jour." : "Coordonnées des membres de l’association."}</p>
           </div>
           <label className="search-control">
             <span className="search-symbol" aria-hidden="true">⌕</span>
@@ -223,9 +230,9 @@ export default function Members() {
 
         <div className="table-scroll">
           <table className="members-table">
-            <thead><tr><th scope="col">Membre</th><th scope="col">Rôle</th><th scope="col">Contact</th><th scope="col">Adhésion</th><th scope="col">Statut</th><th scope="col"><span className="sr-only">Actions</span></th></tr></thead>
+            <thead><tr><th scope="col">Membre</th><th scope="col">Rôle</th><th scope="col">Contact</th><th scope="col">Adhésion</th><th scope="col">Statut</th>{canManageMembers && <th scope="col"><span className="sr-only">Actions</span></th>}</tr></thead>
             <tbody>
-              {isLoading && <tr><td colSpan={6}><div className="empty-state"><strong>Chargement des membres…</strong></div></td></tr>}
+              {isLoading && <tr><td colSpan={canManageMembers ? 6 : 5}><div className="empty-state"><strong>Chargement des membres…</strong></div></td></tr>}
               {!isLoading && displayedMembers.map((member) => (
                 <tr key={member.id}>
                   <td data-label="Membre">
@@ -238,16 +245,16 @@ export default function Members() {
                   <td data-label="Contact" className="contact-cell">{member.phone || "—"}</td>
                   <td data-label="Adhésion" className="date-cell">{formatDate(member.joinedAt)}</td>
                   <td data-label="Statut"><span className={`status-pill ${member.status}`}>{member.status === "active" ? "Actif" : "Archivé"}</span></td>
-                  <td data-label="Actions">
+                  {canManageMembers && <td data-label="Actions">
                     <div className="row-actions">
                       <button className="icon-action" onClick={() => openEditModal(member)} aria-label={`Modifier ${member.firstName} ${member.lastName}`} title="Modifier">✎</button>
                       <button className="text-action" onClick={() => toggleArchive(member)}>{member.status === "active" ? "Archiver" : "Réactiver"}</button>
                     </div>
-                  </td>
+                  </td>}
                 </tr>
               ))}
               {!isLoading && displayedMembers.length === 0 && (
-                <tr><td colSpan={6}><div className="empty-state"><span aria-hidden="true">♙</span><strong>{query ? "Aucun résultat" : "Aucun membre dans cette liste"}</strong><p>{query ? "Essayez un autre nom, e-mail ou rôle." : "Ajoutez un membre pour commencer à constituer l’annuaire."}</p>{!query && <button className="button button-secondary" onClick={openCreateModal}>Ajouter un membre</button>}</div></td></tr>
+                <tr><td colSpan={canManageMembers ? 6 : 5}><div className="empty-state"><span aria-hidden="true">♙</span><strong>{query ? "Aucun résultat" : "Aucun membre dans cette liste"}</strong><p>{query ? "Essayez un autre nom, e-mail ou rôle." : canManageMembers ? "Ajoutez un membre pour commencer à constituer l’annuaire." : "Aucun membre n’est actuellement affiché."}</p>{!query && canManageMembers && <button className="button button-secondary" onClick={openCreateModal}>Ajouter un membre</button>}</div></td></tr>
               )}
             </tbody>
           </table>
