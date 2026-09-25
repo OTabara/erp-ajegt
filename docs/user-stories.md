@@ -183,6 +183,13 @@ Je veux consulter l'annuaire des membres,
 
 Afin de retrouver un autre membre.
 
+### Critères d'acceptation
+
+- Un membre connecté peut consulter l'annuaire.
+- Un membre ne peut pas modifier ni archiver les fiches des autres membres.
+- Seuls un secrétaire ou un administrateur peuvent créer, modifier ou archiver une fiche membre.
+- L'API refuse également les tentatives de modification ou d'archivage d'un membre non autorisé.
+
 ---
 
 ## US-007 - Ajouter un membre
@@ -200,6 +207,10 @@ En tant que secrétaire,
 Je veux enregistrer un nouveau membre,
 
 Afin de gérer les adhésions.
+
+### Critères d'acceptation
+
+- Seul un secrétaire ou un administrateur peut ajouter une fiche membre.
 
 ---
 
@@ -219,6 +230,10 @@ Je veux modifier les informations d'un membre,
 
 Afin de corriger ou mettre à jour son dossier.
 
+### Critères d'acceptation
+
+- Seul un secrétaire ou un administrateur peut modifier une fiche membre.
+
 ---
 
 ## US-009 - Archiver un membre
@@ -236,6 +251,10 @@ En tant que secrétaire,
 Je veux archiver un membre,
 
 Afin de conserver son historique sans supprimer ses données.
+
+### Critères d'acceptation
+
+- Seul un secrétaire ou un administrateur peut archiver ou réactiver une fiche membre.
 
 ---
 
