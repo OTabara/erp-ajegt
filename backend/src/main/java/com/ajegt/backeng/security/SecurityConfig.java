@@ -32,6 +32,8 @@ public class SecurityConfig {
                                 "/api/auth/password-reset/**").permitAll()
                         .requestMatchers("/api/auth/pending-registrations/**").hasAnyRole("SECRETARY", "ADMIN")
                         .requestMatchers("/api/finance/**").hasAnyRole("TREASURER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/events/**").hasAnyRole("MEMBER", "SECRETARY", "TREASURER", "ADMIN")
+                        .requestMatchers("/api/events/**").hasAnyRole("SECRETARY", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/members/**").hasAnyRole("MEMBER", "SECRETARY", "TREASURER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/members/**").hasAnyRole("SECRETARY", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/members/**").hasAnyRole("SECRETARY", "ADMIN")
