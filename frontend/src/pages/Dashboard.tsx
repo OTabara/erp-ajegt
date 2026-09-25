@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
-import { ApiError, getPendingRegistrations } from "../api/auth";
+import { getPendingRegistrations } from "../api/auth";
 import type { PendingRegistration } from "../api/auth";
+import { ApiError } from "../api/http";
 
 const dateFormat = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium" });
 
