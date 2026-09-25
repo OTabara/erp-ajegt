@@ -226,6 +226,8 @@ a { color: inherit; }
 .auth-form .button { min-height: 42px; margin-top: 4px; font-size: 12px; }
 .auth-switch { margin: 20px 0 0; color: #798791; font-size: 11px; text-align: center; }
 .auth-switch a { color: var(--teal-dark); font-weight: 700; }
+.auth-forgot { margin: -7px 0 0; font-size: 10px; text-align: right; }
+.auth-forgot a { color: var(--teal-dark); font-weight: 600; }
 .auth-error { margin: 0; color: #ad594c; font-size: 11px; }
 .auth-success { padding: 14px; border: 1px solid #cfe4d5; border-radius: 8px; background: #f0f7f1; color: #416b4e; font-size: 12px; line-height: 1.6; }
 .auth-success p { margin-top: 5px; }

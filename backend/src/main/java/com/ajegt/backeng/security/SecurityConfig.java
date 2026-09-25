@@ -28,7 +28,8 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/csrf", "/api/auth/login", "/api/auth/register").permitAll()
+                        .requestMatchers("/api/auth/csrf", "/api/auth/login", "/api/auth/register",
+                                "/api/auth/password-reset/**").permitAll()
                         .requestMatchers("/api/auth/pending-registrations/**").hasAnyRole("SECRETARY", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/members/**").hasAnyRole("MEMBER", "SECRETARY", "TREASURER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/members/**").hasAnyRole("SECRETARY", "ADMIN")

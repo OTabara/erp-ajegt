@@ -23,6 +23,7 @@ export default function Login() {
     <form className="auth-form" onSubmit={submit}>
       <label>Adresse e-mail<input autoComplete="email" type="email" required maxLength={160} value={email} onChange={e => setEmail(e.target.value)} /></label>
       <label>Mot de passe<input autoComplete="current-password" type="password" required value={password} onChange={e => setPassword(e.target.value)} /></label>
+      <p className="auth-forgot"><Link to="/forgot-password">Mot de passe oublié ?</Link></p>
       {error && <p role="alert" className="auth-error">{error}</p>}
       <button className="button button-primary" disabled={busy}>{busy ? "Connexion…" : "Se connecter"}</button>
     </form>

@@ -21,13 +21,15 @@ import java.util.UUID;
 public class AuthController {
     private final AccountRepository accounts;
     private final MemberService members;
+    private final PasswordResetService passwordResetService;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     public AuthController(AccountRepository accounts, org.springframework.security.crypto.password.PasswordEncoder passwordEncoder,
-                          MemberService members) {
+                          MemberService members, PasswordResetService passwordResetService) {
         this.accounts = accounts;
         this.passwordEncoder = passwordEncoder;
         this.members = members;
+        this.passwordResetService = passwordResetService;
     }
 
     @GetMapping("/csrf")
@@ -80,6 +82,23 @@ public class AuthController {
         return new RegistrationResponse("Si cette adresse peut être utilisée, la demande sera examinée par un responsable AJEGT.");
     }
 
+    @PostMapping("/password-reset/request")
+    public RegistrationResponse requestPasswordReset(@Valid @RequestBody PasswordResetRequest request) {
+        return new RegistrationResponse(passwordResetService.requestReset(request.email()));
+    }
+
+    @PostMapping("/password-reset/confirm")
+    public org.springframework.http.ResponseEntity<Void> confirmPasswordReset(@Valid @RequestBody PasswordResetConfirmation request) {
+        try {
+            passwordResetService.resetPassword(request.token(), request.newPassword());
+            return org.springframework.http.ResponseEntity.noContent().build();
+        } catch (PasswordResetService.InvalidPasswordResetException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le lien est invalide ou a expiré. Demandez un nouveau lien.");
+        } catch (PasswordResetService.PasswordTooLongException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le nouveau mot de passe est trop long.");
+        }
+    }
+
     @GetMapping("/pending-registrations")
     public java.util.List<PendingRegistration> pendingRegistrations() {
         return accounts.findAllByStatusOrderByCreatedAtAsc(AccountStatus.PENDING).stream()
@@ -116,6 +135,9 @@ public class AuthController {
     public record ProfileResponse(String email, String displayName, String phone, AccountRole role, java.time.Instant createdAt) { }
     public record ProfileUpdateRequest(@NotBlank @Size(max = 100) String displayName, @Size(max = 30) String phone) { }
     public record RegistrationResponse(String message) { }
+    public record PasswordResetRequest(@NotBlank @Email @Size(max = 160) String email) { }
+    public record PasswordResetConfirmation(@NotBlank String token,
+                                            @NotBlank @Size(min = 12, max = 100) String newPassword) { }
     public record PendingRegistration(UUID id, String email, String displayName, java.time.Instant createdAt) { }
     public record ApprovalRequest(AccountRole role) { }
     public record RegistrationRequest(@NotBlank @Email @Size(max = 160) String email,
