@@ -1,0 +1,10 @@
+package com.ajegt.backeng.members;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.UUID;
+
+public interface MemberRepository extends JpaRepository<MemberEntity, UUID> {
+    boolean existsByEmailIgnoreCase(String email);
+    boolean existsByEmailIgnoreCaseAndIdNot(String email, UUID id);
+}
