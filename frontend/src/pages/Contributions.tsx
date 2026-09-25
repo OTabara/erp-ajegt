@@ -7,6 +7,7 @@ import { fetchMembers } from "../api/members";
 import type { Member } from "../api/members";
 
 const currentYear = new Date().getFullYear();
+const currentMonth = new Date().getMonth() + 1;
 const months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
 const paymentMethods: { value: PaymentMethod; label: string }[] = [
   { value: "CASH", label: "Espèces" }, { value: "BANK_TRANSFER", label: "Virement" },
@@ -44,7 +45,22 @@ export default function Contributions() {
   }, []);
 
   const total = useMemo(() => items.reduce((sum, item) => sum + item.amount, 0), [items]);
-  const uniqueMembers = useMemo(() => new Set(items.map(item => item.memberId)).size, [items]);
+  const upToDateMembers = useMemo(() => members.filter(member => {
+    if (year > currentYear) return false;
+    const joinedYear = Number(member.joinedAt.slice(0, 4));
+    const joinedMonth = Number(member.joinedAt.slice(5, 7));
+    const firstDueMonth = joinedYear < year ? 1 : joinedYear === year ? joinedMonth : 13;
+    const lastDueMonth = year < currentYear ? 12 : currentMonth;
+    if (firstDueMonth > lastDueMonth) return true;
+
+    const payments = items.filter(item => item.memberId === member.id);
+    if (payments.some(item => item.type === "ANNUAL")) return true;
+    const paidMonths = new Set(payments.filter(item => item.type === "MONTHLY").map(item => item.periodMonth));
+    for (let month = firstDueMonth; month <= lastDueMonth; month += 1) {
+      if (!paidMonths.has(month)) return false;
+    }
+    return true;
+  }).length, [items, members, year]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError(""); setNotice(""); setSaving(true);
@@ -64,7 +80,7 @@ export default function Contributions() {
     <div className="contribution-stats" aria-label="Résumé annuel des cotisations">
       <div className="stat-card"><span className="stat-icon stat-icon-green" aria-hidden="true">€</span><span className="stat-copy"><span>Montant encaissé</span><strong>{formatAmount(total)}</strong></span><span className="stat-caption">en {year}</span></div>
       <div className="stat-card"><span className="stat-icon stat-icon-blue" aria-hidden="true">✓</span><span className="stat-copy"><span>Paiements reçus</span><strong>{items.length}</strong></span><span className="stat-caption">en {year}</span></div>
-      <div className="stat-card"><span className="stat-icon stat-icon-sand" aria-hidden="true">♙</span><span className="stat-copy"><span>Membres à jour</span><strong>{uniqueMembers}</strong></span><span className="stat-caption">sur {members.length} actifs</span></div>
+      <div className="stat-card"><span className="stat-icon stat-icon-sand" aria-hidden="true">♙</span><span className="stat-copy"><span>Membres à jour</span><strong>{upToDateMembers}</strong></span><span className="stat-caption">sur {members.length} actifs · jusqu’à {year === currentYear ? months[currentMonth - 1].toLocaleLowerCase("fr-FR") : year}</span></div>
     </div>
     {error && <div className="page-error" role="alert"><span>{error}</span><button className="button button-secondary" onClick={() => void reload()}>Réessayer</button></div>}
     {notice && <p className="profile-notice" role="status">{notice}</p>}
