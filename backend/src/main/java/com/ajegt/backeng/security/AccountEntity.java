@@ -79,4 +79,5 @@ public class AccountEntity {
         this.displayName = displayName.trim();
         this.phone = phone == null ? "" : phone.trim();
     }
+    public void updatePasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
 }

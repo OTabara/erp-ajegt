@@ -19,3 +19,5 @@ export const updateProfile = (data: Pick<MemberProfile, "displayName" | "phone">
 export const getPendingRegistrations = () => apiRequest<PendingRegistration[]>("/api/auth/pending-registrations");
 export const approveRegistration = (id: string, role: AccountRole) => apiRequest<void>(`/api/auth/pending-registrations/${encodeURIComponent(id)}/approve`, { method: "POST", body: JSON.stringify({ role }) });
 export const rejectRegistration = (id: string) => apiRequest<void>(`/api/auth/pending-registrations/${encodeURIComponent(id)}/reject`, { method: "POST" });
+export const requestPasswordReset = (email: string) => apiRequest<{ message: string }>("/api/auth/password-reset/request", { method: "POST", body: JSON.stringify({ email }) });
+export const confirmPasswordReset = (token: string, newPassword: string) => apiRequest<void>("/api/auth/password-reset/confirm", { method: "POST", body: JSON.stringify({ token, newPassword }) });

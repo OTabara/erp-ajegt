@@ -4,6 +4,7 @@ import AppLayout from "./components/AppLayout";
 import Archives from "./pages/Archives";
 import Dashboard from "./pages/Dashboard";
 import Events from "./pages/Events";
+import ForgotPassword from "./pages/ForgotPassword";
 import Login from "./pages/Login";
 import Members from "./pages/Members";
 import News from "./pages/News";
@@ -11,6 +12,7 @@ import Offices from "./pages/Offices";
 import Register from "./pages/Register";
 import RegistrationRequests from "./pages/RegistrationRequests";
 import Profile from "./pages/Profile";
+import ResetPassword from "./pages/ResetPassword";
 import { AuthProvider } from "./auth/AuthContext";
 import { useAuth } from "./auth/useAuth";
 
@@ -31,6 +33,8 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route element={<RequireAuth />}><Route element={<AppLayout />}>
           <Route index element={<Navigate to="/members" replace />} />
           <Route path="dashboard" element={<Dashboard />} />

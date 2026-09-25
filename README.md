@@ -49,7 +49,22 @@ L’application est disponible à l’adresse locale affichée par Vite. L’API
 
 Les données de démonstration sont fictives. Chaque personne peut demander un compte ; son accès reste bloqué jusqu’à l’approbation d’un secrétaire ou d’un administrateur. Seul un administrateur peut attribuer les rôles de secrétaire, trésorier ou administrateur. Les mots de passe sont hachés et les requêtes d’écriture protégées contre les attaques CSRF. Le compte bootstrap est le point de départ pour valider les demandes.
 
-La récupération de mot de passe par e-mail n’est pas activée : aucun fournisseur d’e-mail n’est configuré. Les responsables peuvent gérer les demandes dans « Demandes d’accès ».
+### E-mails de réinitialisation
+
+La réinitialisation du mot de passe utilise un fournisseur SMTP. Configurez-le dans le terminal du backend avant son démarrage, sans enregistrer les identifiants dans le dépôt :
+
+```powershell
+$env:SPRING_MAIL_HOST = "smtp.example.org"
+$env:SPRING_MAIL_PORT = "587"
+$env:SPRING_MAIL_USERNAME = "votre-identifiant"
+$env:SPRING_MAIL_PASSWORD = "votre-mot-de-passe"
+$env:SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH = "true"
+$env:SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE = "true"
+$env:AJEGT_MAIL_FROM = "no-reply@example.org"
+$env:AJEGT_FRONTEND_URL = "http://127.0.0.1:5173"
+```
+
+Le lien expire après 30 minutes, est à usage unique, et une nouvelle demande invalide le lien précédent. Sans service e-mail configuré, l’application répond de manière générique mais aucun lien ne peut être envoyé.
 
 ## Documentation
 

@@ -78,6 +78,14 @@ Je veux réinitialiser mon mot de passe,
 
 Afin de retrouver l'accès à mon compte.
 
+### Critères d'acceptation
+
+- Le membre peut demander un lien de réinitialisation par e-mail.
+- La réponse ne révèle pas si l'adresse est associée à un compte.
+- Le lien expire après 30 minutes et ne peut être utilisé qu'une fois.
+- Le membre définit un nouveau mot de passe conforme aux règles de sécurité.
+- Une nouvelle demande invalide le lien précédent.
+
 ---
 
 ## US-062 - Demander un compte et faire approuver l'inscription
