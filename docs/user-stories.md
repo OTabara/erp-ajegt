@@ -320,11 +320,32 @@ Afin de pouvoir la présenter lors des événements.
 
 ## US-018 - Créer un événement
 
+### Critères d'acceptation
+
+- Seuls un secrétaire ou un administrateur peuvent créer un événement.
+- Un événement comporte un titre, un lieu, une date de début et une date de fin ; la fin est postérieure au début.
+- Un événement nouvellement créé reste en brouillon et n'est pas visible aux membres avant publication.
+
 ## US-019 - Modifier un événement
+
+### Critères d'acceptation
+
+- Seuls un secrétaire ou un administrateur peuvent modifier un événement.
+- Les changements de titre, description, lieu et horaires sont enregistrés.
 
 ## US-020 - Annuler un événement
 
+### Critères d'acceptation
+
+- Seuls un secrétaire ou un administrateur peuvent annuler ou republier un événement.
+- Un événement annulé est identifié comme tel dans le calendrier et n'est pas affiché comme rendez-vous actif aux membres.
+
 ## US-021 - Publier un événement
+
+### Critères d'acceptation
+
+- Seuls un secrétaire ou un administrateur peuvent publier un événement.
+- Les membres connectés ne voient que les événements publiés.
 
 ## US-022 - S'inscrire à un événement
 
