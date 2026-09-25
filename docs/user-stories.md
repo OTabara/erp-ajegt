@@ -371,9 +371,28 @@ Afin de tenir à jour la situation financière des membres.
 
 ## US-029 - Enregistrer une recette
 
+### Critères d'acceptation
+
+- Seuls un trésorier ou un administrateur peuvent enregistrer une recette.
+- Une recette comporte une catégorie, un libellé, un montant strictement positif, une date et un mode de paiement.
+- La date ne peut pas être dans le futur et l'opération apparaît dans le journal de son année.
+
 ## US-030 - Enregistrer une dépense
 
+### Critères d'acceptation
+
+- Seuls un trésorier ou un administrateur peuvent enregistrer une dépense.
+- Une dépense comporte une catégorie, un libellé, un montant strictement positif, une date et un mode de paiement.
+- La date ne peut pas être dans le futur et l'opération apparaît dans le journal de son année.
+
 ## US-031 - Consulter le budget
+
+### Critères d'acceptation
+
+- Seuls un trésorier ou un administrateur peuvent consulter le budget annuel.
+- Le résumé distingue les recettes, les dépenses et le solde.
+- Les cotisations sont incluses dans les recettes sans être ressaisies comme opérations manuelles.
+- Le journal financier permet de retrouver le type, la catégorie, le libellé, le montant, la date et le mode de paiement de chaque opération.
 
 ## US-032 - Générer le bilan financier
 
