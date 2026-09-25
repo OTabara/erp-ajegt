@@ -212,3 +212,29 @@ a { color: inherit; }
   .modal-actions { flex-direction: column-reverse; }
   .modal-actions .button { width: 100%; }
 }
+
+.auth-screen { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at 15% 10%, #e7f1ed, transparent 35%), var(--canvas); }
+.auth-card { width: min(100%, 430px); padding: 34px; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: 0 18px 50px #1c344011; }
+.auth-brand { display: flex; align-items: center; gap: 11px; margin-bottom: 29px; color: var(--navy); font: 800 16px var(--font-display); letter-spacing: 1px; }
+.auth-card h1 { margin: 0 0 7px; color: #1c2c38; font: 700 27px var(--font-display); letter-spacing: -.8px; }
+.auth-subtitle { margin: 0 0 23px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.auth-form { display: grid; gap: 15px; }
+.auth-form label { display: grid; gap: 7px; color: #52636c; font-size: 11px; font-weight: 600; }
+.auth-form label small { display: inline; color: #89959b; font-weight: 400; }
+.auth-form input { width: 100%; min-height: 41px; padding: 0 11px; border: 1px solid #dfe5e6; border-radius: 7px; background: white; color: #354751; font-size: 12px; }
+.auth-form input:focus { border-color: #75a89b; outline: 0; box-shadow: 0 0 0 3px #4b917e13; }
+.auth-form .button { min-height: 42px; margin-top: 4px; font-size: 12px; }
+.auth-switch { margin: 20px 0 0; color: #798791; font-size: 11px; text-align: center; }
+.auth-switch a { color: var(--teal-dark); font-weight: 700; }
+.auth-error { margin: 0; color: #ad594c; font-size: 11px; }
+.auth-success { padding: 14px; border: 1px solid #cfe4d5; border-radius: 8px; background: #f0f7f1; color: #416b4e; font-size: 12px; line-height: 1.6; }
+.auth-success p { margin-top: 5px; }
+.auth-loading { min-height: 100vh; display: grid; place-items: center; color: #657780; font-size: 13px; }
+.approval-list { padding: 0 19px; }
+.approval-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 15px 0; border-top: 1px solid #eff1f2; }
+.approval-row > div:first-child { display: grid; gap: 4px; }
+.approval-row strong { color: #344651; font-size: 12px; }
+.approval-row span, .approval-row small { color: #87939a; font-size: 10px; }
+.approval-actions { display: flex; align-items: center; gap: 8px; }
+.approval-actions select { min-height: 34px; padding: 0 8px; border: 1px solid #dfe5e6; border-radius: 6px; background: white; color: #50616b; font-size: 10px; }
+@media (max-width: 700px) { .auth-card { padding: 26px 21px; } .approval-row { align-items: stretch; flex-direction: column; } .approval-actions { flex-wrap: wrap; } .approval-actions select { flex: 1; } }

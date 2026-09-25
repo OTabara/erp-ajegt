@@ -80,6 +80,35 @@ Afin de retrouver l'accès à mon compte.
 
 ---
 
+## US-062 - Demander un compte et faire approuver l'inscription
+
+### Epic
+Authentification
+
+### Priorité
+Haute
+
+### Acteurs
+Personne souhaitant rejoindre l'association, secrétaire, administrateur
+
+### Description
+
+En tant que futur membre,
+
+Je veux demander la création d'un compte avec mon adresse e-mail et mon nom,
+
+Afin d'accéder à l'ERP après validation par un responsable AJEGT.
+
+### Critères d'acceptation
+
+- La demande attribue uniquement le rôle de membre et reste en attente d'approbation.
+- Un compte en attente ou refusé ne peut pas se connecter.
+- Un secrétaire ou administrateur peut approuver ou refuser une demande.
+- Seul un administrateur peut attribuer un rôle privilégié.
+- Une demande déjà traitée ne peut pas être approuvée ou refusée une seconde fois.
+
+---
+
 # Epic 2 - Gestion des membres
 
 ## US-004 - Consulter son profil

@@ -1,4 +1,5 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/useAuth";
 
 const navigation = [
   { to: "/dashboard", label: "Vue d’ensemble", icon: "⌂" },
@@ -10,6 +11,8 @@ const navigation = [
 ];
 
 export default function AppLayout() {
+  const { user, logout } = useAuth(); const navigate = useNavigate();
+  const items = user?.role === "ADMIN" || user?.role === "SECRETARY" ? [...navigation, { to: "/registration-requests", label: "Demandes d’accès", icon: "✉" }] : navigation;
   return (
     <div className="erp-shell">
       <aside className="sidebar">
@@ -23,7 +26,7 @@ export default function AppLayout() {
 
         <div className="sidebar-label">MENU PRINCIPAL</div>
         <nav className="nav-links" aria-label="Navigation principale">
-          {navigation.map((item) => (
+          {items.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -48,8 +51,9 @@ export default function AppLayout() {
         <header className="topbar">
           <div className="topbar-context">Association des Jeunes et Étudiants Guinéens de Toulouse</div>
           <div className="account-chip">
-            <span className="avatar">A</span>
-            <span className="account-name">Espace de démonstration</span>
+            <span className="avatar">{user?.displayName?.slice(0, 1).toUpperCase() ?? "A"}</span>
+            <span className="account-name">{user?.displayName}</span>
+            <button className="text-action" onClick={async () => { await logout(); navigate("/login"); }}>Déconnexion</button>
           </div>
         </header>
         <main className="page-content"><Outlet /></main>
