@@ -34,6 +34,7 @@ a { color: inherit; }
 .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 5; width: 252px; display: flex; flex-direction: column; padding: 26px 16px 18px; background: var(--navy); color: #eaf0f2; }
 .brand { display: flex; align-items: center; gap: 11px; margin: 0 7px 49px; text-decoration: none; }
 .brand-mark { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: #d9a349; color: #1c3340; font: 800 22px var(--font-display); }
+.brand-logo { width: 42px; height: 42px; display: block; flex: none; border-radius: 8px; background: white; object-fit: contain; }
 .brand-copy { display: grid; gap: 3px; }
 .brand-copy strong { font: 800 16px var(--font-display); letter-spacing: .9px; }
 .brand-copy small { color: #9dafb9; font-size: 8px; font-weight: 700; letter-spacing: 1.35px; }
@@ -164,7 +165,7 @@ a { color: inherit; }
   .erp-shell { display: block; }
   .sidebar { position: sticky; inset: 0 0 auto; width: 100%; height: auto; padding: 10px 15px 0; }
   .brand { margin: 0 0 8px; }
-  .brand-mark { width: 32px; height: 32px; border-radius: 9px; font-size: 18px; }
+  .brand-mark, .brand-logo { width: 32px; height: 32px; border-radius: 9px; }
   .brand-copy { display: flex; align-items: baseline; gap: 8px; }
   .brand-copy small { font-size: 7px; }
   .sidebar-label, .sidebar-bottom { display: none; }

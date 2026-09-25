@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
 
 import AppLayout from "./components/AppLayout";
 import Archives from "./pages/Archives";
@@ -17,14 +17,14 @@ import { AuthProvider } from "./auth/AuthContext";
 import { useAuth } from "./auth/useAuth";
 
 function RequireAuth() {
-  const { user, loading } = useAuth(); const location = useLocation();
+  const { user, loading } = useAuth();
   if (loading) return <div className="auth-loading" role="status">Chargement de votre session…</div>;
-  return user ? <Outlet /> : <Navigate to="/login" replace state={{ from: location }} />;
+  return user ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
 function RequireManager() {
   const { user } = useAuth();
-  return user?.role === "ADMIN" || user?.role === "SECRETARY" ? <Outlet /> : <Navigate to="/members" replace />;
+  return user?.role === "ADMIN" || user?.role === "SECRETARY" ? <Outlet /> : <Navigate to="/dashboard" replace />;
 }
 
 function App() {
@@ -36,7 +36,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route element={<RequireAuth />}><Route element={<AppLayout />}>
-          <Route index element={<Navigate to="/members" replace />} />
+          <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="members" element={<Members />} />
           <Route path="profile" element={<Profile />} />
@@ -46,7 +46,7 @@ function App() {
           <Route path="archives" element={<Archives />} />
           <Route element={<RequireManager />}><Route path="registration-requests" element={<RegistrationRequests />} /></Route>
         </Route></Route>
-        <Route path="*" element={<Navigate to="/members" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </AuthProvider></BrowserRouter>
   );

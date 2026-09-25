@@ -1,21 +1,20 @@
 import { useState } from "react";
 import type { FormEvent, ReactNode } from "react";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 import { ApiError } from "../api/http";
 
 export default function Login() {
   const { user, login } = useAuth();
-  const location = useLocation();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  if (user) return <Navigate to="/members" replace />;
+  if (user) return <Navigate to="/dashboard" replace />;
   async function submit(event: FormEvent) {
     event.preventDefault(); setError(""); setBusy(true);
-    try { await login(email, password); navigate(location.state?.from?.pathname ?? "/members", { replace: true }); }
+    try { await login(email, password); navigate("/dashboard", { replace: true }); }
     catch (reason) { setError(reason instanceof ApiError ? reason.message : "Connexion impossible."); }
     finally { setBusy(false); }
   }
@@ -32,5 +31,5 @@ export default function Login() {
 }
 
 export function AuthPage({ children }: { children: ReactNode }) {
-  return <main className="auth-screen"><section className="auth-card"><div className="auth-brand"><span className="brand-mark">A</span><strong>AJEGT</strong></div>{children}</section></main>;
+  return <main className="auth-screen"><section className="auth-card"><div className="auth-brand"><img className="brand-logo" src="/logo_ajegt.jpeg" alt="" /><strong>AJEGT</strong></div>{children}</section></main>;
 }
