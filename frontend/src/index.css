@@ -314,3 +314,23 @@ a { color: inherit; }
 .contribution-history .members-table td { white-space: nowrap; }
 @media (max-width: 760px) { .contribution-stats { grid-template-columns: 1fr; } .contribution-form { grid-template-columns: 1fr; } .contribution-form .form-span, .contribution-amount, .contribution-form > button { grid-column: auto; } .contribution-year { margin-top: 12px; } }
 .finance-summary .stat-card:nth-child(2) .stat-copy strong { color: #a16b4b; }
+.finance-report-actions { display: flex; align-items: end; gap: 8px; }
+.finance-report-actions .button { min-height: 38px; white-space: nowrap; }
+.print-only { display: none; }
+@media print {
+  @page { size: A4 portrait; margin: 14mm; }
+  html, body { background: #fff !important; }
+  .sidebar, .topbar, .page-footer, .no-print { display: none !important; }
+  .erp-shell, .main-column { display: block !important; width: auto !important; min-height: 0 !important; }
+  .page-content { width: 100% !important; max-width: none !important; padding: 0 !important; }
+  .print-only { display: block !important; }
+  .finance-report-header { margin: 0 0 18px; padding-bottom: 12px; border-bottom: 2px solid #294f49; }
+  .finance-report-header h1 { margin: 5px 0; color: #213832; font-size: 24px; }
+  .finance-report-header p, .finance-report-header small { margin: 0; color: #6d7b75; font-size: 10px; }
+  .finance-summary { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 8px !important; }
+  .finance-summary .stat-card, .contribution-history { break-inside: avoid; box-shadow: none !important; }
+  .contribution-history .panel-heading { padding-top: 10px; }
+  .contribution-history .table-scroll { overflow: visible !important; }
+  .contribution-history table { width: 100% !important; font-size: 9px !important; }
+  .contribution-history th, .contribution-history td { padding: 6px 5px !important; }
+}

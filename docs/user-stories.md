@@ -396,6 +396,13 @@ Afin de tenir à jour la situation financière des membres.
 
 ## US-032 - Générer le bilan financier
 
+### Critères d'acceptation
+
+- Seuls un trésorier ou un administrateur peuvent générer le bilan d'une année.
+- Le bilan reprend les recettes, les cotisations, les dépenses et le solde de l'année choisie.
+- Le bilan peut être exporté au format CSV et imprimé ou enregistré en PDF depuis le navigateur.
+- Le journal du bilan présente le type, la catégorie, le libellé, le montant, la date et le mode de paiement des opérations.
+
 ---
 
 # Epic 6 - Gestion documentaire
