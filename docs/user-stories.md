@@ -127,6 +127,12 @@ Je veux consulter mon profil,
 
 Afin de vérifier mes informations personnelles.
 
+### Critères d'acceptation
+
+- Le membre consulte uniquement les informations de son compte connecté.
+- Le profil affiche son nom, son e-mail, son téléphone, son rôle et la date de création du compte.
+- L'e-mail et le rôle sont affichés en lecture seule.
+
 ---
 
 ## US-005 - Modifier son profil
@@ -144,6 +150,12 @@ En tant que membre,
 Je veux modifier mes informations personnelles,
 
 Afin qu'elles restent à jour.
+
+### Critères d'acceptation
+
+- Le membre peut modifier son nom complet et son numéro de téléphone.
+- Les changements sont conservés après actualisation de la page.
+- Le membre ne peut pas modifier son adresse e-mail de connexion ou son rôle depuis son profil.
 
 ---
 

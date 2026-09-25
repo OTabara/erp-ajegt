@@ -37,6 +37,29 @@ public class AuthController {
         return new SessionResponse(account.getId(), account.getEmail(), account.getDisplayName(), account.getRole());
     }
 
+    @GetMapping("/profile")
+    public ProfileResponse profile(Authentication authentication) {
+        AccountEntity account = authenticatedAccount(authentication);
+        return profileResponse(account);
+    }
+
+    @PatchMapping("/profile")
+    @Transactional
+    public ProfileResponse updateProfile(@Valid @RequestBody ProfileUpdateRequest request, Authentication authentication) {
+        AccountEntity account = authenticatedAccount(authentication);
+        account.updateProfile(request.displayName(), request.phone());
+        return profileResponse(account);
+    }
+
+    private AccountEntity authenticatedAccount(Authentication authentication) {
+        return accounts.findByEmailIgnoreCase(authentication.getName())
+                .orElseThrow(() -> new IllegalStateException("Compte authentifié introuvable."));
+    }
+
+    private static ProfileResponse profileResponse(AccountEntity account) {
+        return new ProfileResponse(account.getEmail(), account.getDisplayName(), account.getPhone(), account.getRole(), account.getCreatedAt());
+    }
+
     @PostMapping("/register")
     public RegistrationResponse register(@Valid @RequestBody RegistrationRequest request) {
         String email = request.email().trim().toLowerCase(java.util.Locale.ROOT);
@@ -47,7 +70,7 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le mot de passe ne peut pas dépasser 72 octets.");
         }
         accounts.save(new AccountEntity(email, request.displayName(), passwordEncoder.encode(request.password()),
-                AccountRole.MEMBER, AccountStatus.PENDING));
+                AccountRole.MEMBER, AccountStatus.PENDING, request.phone()));
         return new RegistrationResponse("Si cette adresse peut être utilisée, la demande sera examinée par un responsable AJEGT.");
     }
 
@@ -83,10 +106,13 @@ public class AuthController {
 
     public record CsrfResponse(String token, String headerName) { }
     public record SessionResponse(UUID id, String email, String displayName, AccountRole role) { }
+    public record ProfileResponse(String email, String displayName, String phone, AccountRole role, java.time.Instant createdAt) { }
+    public record ProfileUpdateRequest(@NotBlank @Size(max = 100) String displayName, @Size(max = 30) String phone) { }
     public record RegistrationResponse(String message) { }
     public record PendingRegistration(UUID id, String email, String displayName, java.time.Instant createdAt) { }
     public record ApprovalRequest(AccountRole role) { }
     public record RegistrationRequest(@NotBlank @Email @Size(max = 160) String email,
                                       @NotBlank @Size(max = 100) String displayName,
+                                      @Size(max = 30) String phone,
                                       @NotBlank @Size(min = 12, max = 100) String password) { }
 }

@@ -4,7 +4,7 @@ Application de gestion de l’Association des Jeunes et Étudiants Guinéens de 
 
 ## État actuel
 
-Le dépôt contient un prototype de gestion associative : annuaire des membres et demandes d’accès avec inscription libre suivie d’une approbation par un responsable. Le frontend communique avec l’API Spring Boot ; les exemples et changements sont stockés dans une base H2 locale persistante.
+Le dépôt contient un prototype de gestion associative : annuaire des membres, profils personnels, et demandes d’accès avec inscription libre suivie d’une approbation par un responsable. Le frontend communique avec l’API Spring Boot ; les exemples et changements sont stockés dans une base H2 locale persistante.
 
 **Ne saisissez pas de données personnelles réelles.** Le profil de développement est prévu pour un usage local. Avant tout déploiement réel, configurez une base PostgreSQL, HTTPS, une gestion sûre des secrets et une procédure de sauvegarde.
 

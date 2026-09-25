@@ -27,6 +27,9 @@ public class AccountEntity {
     @Column(nullable = false, length = 100)
     private String displayName;
 
+    @Column(length = 30)
+    private String phone;
+
     @Column(nullable = false, length = 100)
     private String passwordHash;
 
@@ -45,12 +48,17 @@ public class AccountEntity {
     }
 
     public AccountEntity(String email, String displayName, String passwordHash, AccountRole role) {
-        this(email, displayName, passwordHash, role, AccountStatus.ACTIVE);
+        this(email, displayName, passwordHash, role, AccountStatus.ACTIVE, "");
     }
 
     public AccountEntity(String email, String displayName, String passwordHash, AccountRole role, AccountStatus status) {
+        this(email, displayName, passwordHash, role, status, "");
+    }
+
+    public AccountEntity(String email, String displayName, String passwordHash, AccountRole role, AccountStatus status, String phone) {
         this.email = email.trim().toLowerCase(Locale.ROOT);
         this.displayName = displayName.trim();
+        this.phone = phone == null ? "" : phone.trim();
         this.passwordHash = passwordHash;
         this.role = role;
         this.status = status;
@@ -60,10 +68,15 @@ public class AccountEntity {
     public UUID getId() { return id; }
     public String getEmail() { return email; }
     public String getDisplayName() { return displayName; }
+    public String getPhone() { return phone == null ? "" : phone; }
     public String getPasswordHash() { return passwordHash; }
     public AccountRole getRole() { return role; }
     public AccountStatus getStatus() { return status; }
     public Instant getCreatedAt() { return createdAt; }
     public void approve(AccountRole role) { this.role = role; this.status = AccountStatus.ACTIVE; }
     public void reject() { this.status = AccountStatus.REJECTED; }
+    public void updateProfile(String displayName, String phone) {
+        this.displayName = displayName.trim();
+        this.phone = phone == null ? "" : phone.trim();
+    }
 }

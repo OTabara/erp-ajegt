@@ -4,6 +4,7 @@ import { useAuth } from "../auth/useAuth";
 const navigation = [
   { to: "/dashboard", label: "Vue d’ensemble", icon: "⌂" },
   { to: "/members", label: "Membres", icon: "♙" },
+  { to: "/profile", label: "Mon profil", icon: "◉" },
   { to: "/offices", label: "Bureaux", icon: "▤" },
   { to: "/events", label: "Événements", icon: "▦" },
   { to: "/news", label: "Actualités", icon: "▧" },
