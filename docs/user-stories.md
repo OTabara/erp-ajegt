@@ -395,6 +395,14 @@ Je veux consulter le tableau de bord,
 
 Afin de suivre l'activité de l'association.
 
+### Critères d'acceptation
+
+- Le tableau de bord affiche les effectifs actifs et archivés de l'annuaire.
+- Il indique le nombre de nouvelles adhésions depuis le début de l'année et présente les plus récentes.
+- Les secrétaires et administrateurs voient aussi le nombre de demandes d'accès en attente et un accès direct à leur traitement.
+- Les liens rapides respectent les espaces accessibles à chaque rôle.
+- Les données sont chargées depuis l'API et les erreurs peuvent être relancées.
+
 ---
 
 ## US-050 - Consulter les statistiques
