@@ -17,8 +17,8 @@ export default function AppLayout() {
   return (
     <div className="erp-shell">
       <aside className="sidebar">
-        <NavLink className="brand" to="/members" aria-label="AJEGT, accueil">
-          <span className="brand-mark" aria-hidden="true">A</span>
+        <NavLink className="brand" to="/dashboard" aria-label="AJEGT, vue d’ensemble">
+          <img className="brand-logo" src="/logo_ajegt.jpeg" alt="" />
           <span className="brand-copy">
             <strong>AJEGT</strong>
             <small>ESPACE ASSOCIATIF</small>
