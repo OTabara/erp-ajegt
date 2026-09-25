@@ -13,7 +13,11 @@ const navigation = [
 
 export default function AppLayout() {
   const { user, logout } = useAuth(); const navigate = useNavigate();
-  const items = user?.role === "ADMIN" || user?.role === "SECRETARY" ? [...navigation, { to: "/registration-requests", label: "Demandes d’accès", icon: "✉" }] : navigation;
+  const items = [
+    ...navigation,
+    ...(user?.role === "ADMIN" || user?.role === "TREASURER" ? [{ to: "/contributions", label: "Cotisations", icon: "€" }] : []),
+    ...(user?.role === "ADMIN" || user?.role === "SECRETARY" ? [{ to: "/registration-requests", label: "Demandes d’accès", icon: "✉" }] : []),
+  ];
   return (
     <div className="erp-shell">
       <aside className="sidebar">

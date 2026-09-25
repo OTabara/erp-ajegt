@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom
 import AppLayout from "./components/AppLayout";
 import Archives from "./pages/Archives";
 import Dashboard from "./pages/Dashboard";
+import Contributions from "./pages/Contributions";
 import Events from "./pages/Events";
 import ForgotPassword from "./pages/ForgotPassword";
 import Login from "./pages/Login";
@@ -27,6 +28,11 @@ function RequireManager() {
   return user?.role === "ADMIN" || user?.role === "SECRETARY" ? <Outlet /> : <Navigate to="/dashboard" replace />;
 }
 
+function RequireTreasurer() {
+  const { user } = useAuth();
+  return user?.role === "ADMIN" || user?.role === "TREASURER" ? <Outlet /> : <Navigate to="/dashboard" replace />;
+}
+
 function App() {
   return (
     <BrowserRouter><AuthProvider>
@@ -44,6 +50,7 @@ function App() {
           <Route path="events" element={<Events />} />
           <Route path="news" element={<News />} />
           <Route path="archives" element={<Archives />} />
+          <Route element={<RequireTreasurer />}><Route path="contributions" element={<Contributions />} /></Route>
           <Route element={<RequireManager />}><Route path="registration-requests" element={<RegistrationRequests />} /></Route>
         </Route></Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -31,6 +31,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/csrf", "/api/auth/login", "/api/auth/register",
                                 "/api/auth/password-reset/**").permitAll()
                         .requestMatchers("/api/auth/pending-registrations/**").hasAnyRole("SECRETARY", "ADMIN")
+                        .requestMatchers("/api/finance/**").hasAnyRole("TREASURER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/members/**").hasAnyRole("MEMBER", "SECRETARY", "TREASURER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/members/**").hasAnyRole("SECRETARY", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/members/**").hasAnyRole("SECRETARY", "ADMIN")

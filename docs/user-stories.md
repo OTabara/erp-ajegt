@@ -274,6 +274,12 @@ Je veux consulter les cotisations d'un membre,
 
 Afin de vérifier sa situation financière.
 
+### Critères d'acceptation
+
+- Seuls un trésorier ou un administrateur peuvent consulter les paiements.
+- Les paiements sont consultables par année et indiquent le membre, la période, le montant, la date et le moyen de paiement.
+- Les totaux encaissés et le nombre de membres ayant payé sont visibles pour l'année sélectionnée.
+
 ---
 
 ## US-011 - Télécharger sa carte de membre
@@ -337,6 +343,31 @@ Afin de pouvoir la présenter lors des événements.
 # Epic 5 - Gestion financière
 
 ## US-028 - Enregistrer une cotisation
+
+### Epic
+Gestion financière
+
+### Priorité
+Haute
+
+### Acteur
+Trésorier
+
+### Description
+
+En tant que trésorier,
+
+Je veux enregistrer le paiement d'une cotisation,
+
+Afin de tenir à jour la situation financière des membres.
+
+### Critères d'acceptation
+
+- Seuls un trésorier ou un administrateur peuvent enregistrer un paiement.
+- Le tarif est annuel à 60 € ou mensuel à 5 € et le montant est calculé par le serveur.
+- Pour un même membre et une même année, le mode annuel ou mensuel ne peut pas être mélangé.
+- Une cotisation annuelle ne peut être enregistrée qu'une fois par année ; une cotisation mensuelle ne peut être enregistrée qu'une fois par mois.
+- Le paiement enregistre le membre, la période, la date et le moyen de paiement.
 
 ## US-029 - Enregistrer une recette
 

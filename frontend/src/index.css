@@ -300,3 +300,16 @@ a { color: inherit; }
 .dashboard-profile-link small { color: #81948f; font-size: 9px; }
 .dashboard-profile-link a { color: var(--teal-dark); font-size: 10px; font-weight: 700; text-decoration: none; white-space: nowrap; }
 @media (max-width: 560px) { .dashboard-action-panel .panel-heading { align-items: start; } .dashboard-action-panel .panel-heading .button { width: 100%; } .dashboard-spaces { grid-template-columns: 1fr; } .dashboard-profile-link { align-items: start; flex-direction: column; } }
+
+.contribution-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 17px; }
+.contribution-layout { display: grid; gap: 16px; }
+.contribution-year { display: grid; gap: 6px; color: #687982; font-size: 10px; font-weight: 600; }
+.contribution-year select, .contribution-form select, .contribution-form input { min-height: 38px; padding: 0 10px; border: 1px solid #dfe5e6; border-radius: 6px; background: #fff; color: #354751; font-size: 11px; }
+.contribution-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; padding: 0 19px 18px; }
+.contribution-form label { display: grid; gap: 6px; color: #5e6e77; font-size: 10px; font-weight: 600; }
+.contribution-form .form-span { grid-column: 1 / -1; }
+.contribution-amount { display: flex; align-items: center; justify-content: space-between; grid-column: 1 / -1; padding: 12px; border: 1px solid #e1ebe7; border-radius: 7px; background: #f5f9f7; color: #62746e; font-size: 11px; }
+.contribution-amount strong { color: var(--teal-dark); font-size: 17px; }
+.contribution-form > button { grid-column: 1 / -1; justify-self: end; }
+.contribution-history .members-table td { white-space: nowrap; }
+@media (max-width: 760px) { .contribution-stats { grid-template-columns: 1fr; } .contribution-form { grid-template-columns: 1fr; } .contribution-form .form-span, .contribution-amount, .contribution-form > button { grid-column: auto; } .contribution-year { margin-top: 12px; } }
