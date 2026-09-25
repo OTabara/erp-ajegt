@@ -10,6 +10,7 @@ import News from "./pages/News";
 import Offices from "./pages/Offices";
 import Register from "./pages/Register";
 import RegistrationRequests from "./pages/RegistrationRequests";
+import Profile from "./pages/Profile";
 import { AuthProvider } from "./auth/AuthContext";
 import { useAuth } from "./auth/useAuth";
 
@@ -34,6 +35,7 @@ function App() {
           <Route index element={<Navigate to="/members" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="members" element={<Members />} />
+          <Route path="profile" element={<Profile />} />
           <Route path="offices" element={<Offices />} />
           <Route path="events" element={<Events />} />
           <Route path="news" element={<News />} />
