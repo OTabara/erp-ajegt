@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import { createEvent, fetchEvents, setEventStatus, updateEvent } from "../api/events";
+import { createEvent, fetchEvents, registerForEvent, setEventStatus, unregisterFromEvent, updateEvent } from "../api/events";
 import type { EventDraft, EventItem, EventStatus } from "../api/events";
 import { ApiError } from "../api/http";
 import { useAuth } from "../auth/useAuth";
@@ -94,6 +94,16 @@ export default function Events() {
     } catch (cause) { setError(cause instanceof ApiError ? cause.message : "La mise à jour de l’événement a échoué."); }
   }
 
+  async function toggleRegistration(event: EventItem) {
+    setError("");
+    try {
+      const updated = event.registeredByCurrentUser
+        ? await unregisterFromEvent(event.id)
+        : await registerForEvent(event.id);
+      setEvents(items => items.map(item => item.id === updated.id ? updated : item));
+    } catch (cause) { setError(cause instanceof ApiError ? cause.message : "La modification de l’inscription a échoué."); }
+  }
+
   return <>
     <div className="page-heading"><div><div className="eyebrow">VIE ASSOCIATIVE</div><h1>Événements</h1><p>{canManage ? "Créez et gérez les événements de l’association." : "Retrouvez les prochains rendez-vous de l’association."}</p></div>
       {canManage && <button className="button button-primary" onClick={openCreate}>＋ Créer un événement</button>}
@@ -109,6 +119,7 @@ export default function Events() {
         <div className="event-date"><strong>{formatDate(event.startsAt)}</strong><span>{formatTime(event.startsAt)}{new Date(event.endsAt).toDateString() === new Date(event.startsAt).toDateString() ? ` – ${formatTime(event.endsAt)}` : ` – ${formatDate(event.endsAt)} ${formatTime(event.endsAt)}`}</span></div>
         <h2>{event.title}</h2><p className="event-location"><span aria-hidden="true">⌖</span> {event.location}</p>
         {event.description && <p className="event-description">{event.description}</p>}
+        {event.status === "PUBLISHED" && <div className="event-registration"><span>{event.attendeeCount} inscrit{event.attendeeCount === 1 ? "" : "s"}</span><button className={event.registeredByCurrentUser ? "button button-secondary" : "button button-primary"} onClick={() => void toggleRegistration(event)}>{event.registeredByCurrentUser ? "Se désinscrire" : "S’inscrire"}</button></div>}
         {canManage && <div className="event-card-actions"><button className="button button-secondary" onClick={() => void changeStatus(event, event.status === "PUBLISHED" ? "CANCELLED" : "PUBLISHED")}>
           {event.status === "PUBLISHED" ? "Annuler l’événement" : event.status === "CANCELLED" ? "Republier" : "Publier"}
         </button></div>}
