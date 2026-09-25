@@ -1,5 +1,7 @@
 package com.ajegt.backeng.security;
 
+import com.ajegt.backeng.members.MemberService;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.http.HttpStatus;
@@ -18,11 +20,14 @@ import java.util.UUID;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AccountRepository accounts;
+    private final MemberService members;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
-    public AuthController(AccountRepository accounts, org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
+    public AuthController(AccountRepository accounts, org.springframework.security.crypto.password.PasswordEncoder passwordEncoder,
+                          MemberService members) {
         this.accounts = accounts;
         this.passwordEncoder = passwordEncoder;
+        this.members = members;
     }
 
     @GetMapping("/csrf")
@@ -48,6 +53,7 @@ public class AuthController {
     public ProfileResponse updateProfile(@Valid @RequestBody ProfileUpdateRequest request, Authentication authentication) {
         AccountEntity account = authenticatedAccount(authentication);
         account.updateProfile(request.displayName(), request.phone());
+        members.synchronizeAccount(account);
         return profileResponse(account);
     }
 
@@ -90,6 +96,7 @@ public class AuthController {
         boolean admin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         if (!admin && role != AccountRole.MEMBER) throw new AccessDeniedException("Seul un administrateur peut attribuer ce rôle.");
         target.approve(role);
+        members.synchronizeAccount(target);
         return new SessionResponse(target.getId(), target.getEmail(), target.getDisplayName(), target.getRole());
     }
 

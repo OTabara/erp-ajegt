@@ -1,9 +1,13 @@
 package com.ajegt.backeng.members;
 
+import com.ajegt.backeng.security.AccountEntity;
+import com.ajegt.backeng.security.AccountRepository;
+import com.ajegt.backeng.security.AccountStatus;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -12,13 +16,15 @@ import java.util.UUID;
 @Transactional
 public class MemberService {
     private final MemberRepository members;
+    private final AccountRepository accounts;
 
-    public MemberService(MemberRepository members) {
+    public MemberService(MemberRepository members, AccountRepository accounts) {
         this.members = members;
+        this.accounts = accounts;
     }
 
-    @Transactional(readOnly = true)
     public List<MemberResponse> findAll(String status, String search) {
+        synchronizeApprovedAccounts();
         MemberStatus requestedStatus = null;
         if (status != null && !status.isBlank() && !status.equalsIgnoreCase("all")) {
             try {
@@ -35,6 +41,43 @@ public class MemberService {
                 .filter(member -> query.isEmpty() || searchableText(member).contains(query))
                 .map(MemberResponse::from)
                 .toList();
+    }
+
+    public void synchronizeAccount(AccountEntity account) {
+        if (account.getStatus() != AccountStatus.ACTIVE) return;
+
+        MemberEntity member = members.findByEmailIgnoreCase(normalizeEmail(account.getEmail()))
+                .orElseGet(() -> newMemberFrom(account));
+        String[] name = splitDisplayName(account.getDisplayName());
+        member.updateProfile(name[0], name[1], account.getPhone());
+        members.save(member);
+    }
+
+    private void synchronizeApprovedAccounts() {
+        accounts.findAllByStatusOrderByCreatedAtAsc(AccountStatus.ACTIVE).forEach(this::ensureAccountListed);
+    }
+
+    private void ensureAccountListed(AccountEntity account) {
+        if (account.getStatus() != AccountStatus.ACTIVE
+                || members.existsByEmailIgnoreCase(normalizeEmail(account.getEmail()))) return;
+        members.save(newMemberFrom(account));
+    }
+
+    private MemberEntity newMemberFrom(AccountEntity account) {
+        String[] name = splitDisplayName(account.getDisplayName());
+        return new MemberEntity(name[0], name[1], normalizeEmail(account.getEmail()), account.getPhone(), "Membre",
+                account.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDate());
+    }
+
+    private static String[] splitDisplayName(String displayName) {
+        String[] parts = displayName.trim().split("\\s+", 2);
+        String firstName = truncate(parts[0], 80);
+        String lastName = parts.length > 1 ? truncate(parts[1], 80) : "Membre";
+        return new String[] { firstName, lastName };
+    }
+
+    private static String truncate(String value, int maxLength) {
+        return value.length() <= maxLength ? value : value.substring(0, maxLength);
     }
 
     public MemberResponse create(MemberRequest request) {

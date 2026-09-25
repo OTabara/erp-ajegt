@@ -64,6 +64,12 @@ public class MemberEntity {
         this.joinedAt = request.joinedAt();
     }
 
+    public void updateProfile(String firstName, String lastName, String phone) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone == null ? "" : phone.trim();
+    }
+
     public UUID getId() { return id; }
     public String getFirstName() { return firstName; }
     public String getLastName() { return lastName; }
