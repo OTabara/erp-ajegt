@@ -349,7 +349,19 @@ Afin de pouvoir la présenter lors des événements.
 
 ## US-022 - S'inscrire à un événement
 
+### Critères d'acceptation
+
+- Un membre connecté peut s'inscrire à un événement publié dont l'heure de début n'est pas passée.
+- Un membre ne peut avoir qu'une inscription par événement.
+- La liste indique le nombre d'inscrits et si le membre connecté est inscrit.
+- L'inscription est conservée après actualisation.
+
 ## US-023 - Se désinscrire d'un événement
+
+### Critères d'acceptation
+
+- Un membre connecté peut annuler sa propre inscription.
+- La désinscription met à jour le nombre d'inscrits et persiste après actualisation.
 
 ## US-024 - Gérer les participants
 

@@ -33,6 +33,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/pending-registrations/**").hasAnyRole("SECRETARY", "ADMIN")
                         .requestMatchers("/api/finance/**").hasAnyRole("TREASURER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/events/**").hasAnyRole("MEMBER", "SECRETARY", "TREASURER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/events/*/registrations").hasAnyRole("MEMBER", "SECRETARY", "TREASURER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/events/*/registrations").hasAnyRole("MEMBER", "SECRETARY", "TREASURER", "ADMIN")
                         .requestMatchers("/api/events/**").hasAnyRole("SECRETARY", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/members/**").hasAnyRole("MEMBER", "SECRETARY", "TREASURER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/members/**").hasAnyRole("SECRETARY", "ADMIN")
