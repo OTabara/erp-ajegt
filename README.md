@@ -1,42 +1,31 @@
-# AJEGT ERP
+# ERP AJEGT
 
-ERP de gestion de l'Association des Jeunes et Étudiants Guinéens de Toulouse.
+Application de gestion de l’Association des Jeunes et Étudiants Guinéens de Toulouse.
 
-## Objectif
+## État actuel
 
-Centraliser la gestion de l'association :
-- membres
-- bureaux
-- événements
-- finances
-- documents
-- archives
+Le dépôt contient un premier prototype de gestion des membres : annuaire, recherche, filtres, création, modification et archivage. Les exemples sont fictifs et les changements sont conservés dans le `localStorage` du navigateur.
+
+**Ne saisissez pas encore de données personnelles réelles.** L’authentification, l’API métier et la persistance PostgreSQL ne sont pas encore raccordées au frontend.
 
 ## Technologies
 
-Frontend :
-- Next.js
-- React
-- Tailwind CSS
+- Frontend : React, TypeScript, Vite et React Router
+- Backend en préparation : Java 21, Spring Boot et Spring Data JPA
+- Base de données prévue : PostgreSQL
 
-Backend :
-- Spring Boot
-- Java
+## Démarrer le prototype frontend
 
-Base de données :
-- PostgreSQL
+Prérequis : Node.js et npm.
 
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-## Architecture
+Vite affiche l’adresse locale de l’application dans le terminal.
 
-Frontend → API REST → Backend → PostgreSQL
+## Documentation
 
-
-## Fonctionnalités
-
-- Authentification
-- Gestion des membres
-- Gestion des bureaux
-- Gestion des événements
-- Gestion documentaire
-- Tableau de bord
+Les besoins fonctionnels sont recensés dans [`docs/user-stories.md`](docs/user-stories.md).

@@ -1,0 +1,18 @@
+# Node / Vite
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Java / Maven
+backend/target/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+**/application-local.properties
+
+# Logs and operating system files
+*.log
+.DS_Store
+Thumbs.db
