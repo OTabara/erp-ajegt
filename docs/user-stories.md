@@ -397,11 +397,10 @@ Afin de suivre l'activité de l'association.
 
 ### Critères d'acceptation
 
-- Le tableau de bord affiche les effectifs actifs et archivés de l'annuaire.
-- Il indique le nombre de nouvelles adhésions depuis le début de l'année et présente les plus récentes.
-- Les secrétaires et administrateurs voient aussi le nombre de demandes d'accès en attente et un accès direct à leur traitement.
-- Les liens rapides respectent les espaces accessibles à chaque rôle.
-- Les données sont chargées depuis l'API et les erreurs peuvent être relancées.
+- Le tableau de bord propose une navigation vers les espaces associatifs sans recopier la liste ni les statistiques de l'annuaire.
+- Les secrétaires et administrateurs voient les demandes d'accès en attente et un accès direct à leur traitement.
+- Le contenu administratif n'est visible que par les rôles autorisés.
+- Les demandes sont chargées depuis l'API et une erreur peut être relancée.
 
 ---
 
