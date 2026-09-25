@@ -16,6 +16,7 @@ export default function AppLayout() {
   const items = [
     ...navigation,
     ...(user?.role === "ADMIN" || user?.role === "TREASURER" ? [{ to: "/contributions", label: "Cotisations", icon: "€" }] : []),
+    ...(user?.role === "ADMIN" || user?.role === "TREASURER" ? [{ to: "/finance", label: "Recettes et dépenses", icon: "↕" }] : []),
     ...(user?.role === "ADMIN" || user?.role === "SECRETARY" ? [{ to: "/registration-requests", label: "Demandes d’accès", icon: "✉" }] : []),
   ];
   return (

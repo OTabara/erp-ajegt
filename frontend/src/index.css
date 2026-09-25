@@ -313,3 +313,4 @@ a { color: inherit; }
 .contribution-form > button { grid-column: 1 / -1; justify-self: end; }
 .contribution-history .members-table td { white-space: nowrap; }
 @media (max-width: 760px) { .contribution-stats { grid-template-columns: 1fr; } .contribution-form { grid-template-columns: 1fr; } .contribution-form .form-span, .contribution-amount, .contribution-form > button { grid-column: auto; } .contribution-year { margin-top: 12px; } }
+.finance-summary .stat-card:nth-child(2) .stat-copy strong { color: #a16b4b; }

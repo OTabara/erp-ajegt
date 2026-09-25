@@ -5,6 +5,7 @@ import Archives from "./pages/Archives";
 import Dashboard from "./pages/Dashboard";
 import Contributions from "./pages/Contributions";
 import Events from "./pages/Events";
+import FinanceTransactions from "./pages/FinanceTransactions";
 import ForgotPassword from "./pages/ForgotPassword";
 import Login from "./pages/Login";
 import Members from "./pages/Members";
@@ -51,6 +52,7 @@ function App() {
           <Route path="news" element={<News />} />
           <Route path="archives" element={<Archives />} />
           <Route element={<RequireTreasurer />}><Route path="contributions" element={<Contributions />} /></Route>
+          <Route element={<RequireTreasurer />}><Route path="finance" element={<FinanceTransactions />} /></Route>
           <Route element={<RequireManager />}><Route path="registration-requests" element={<RegistrationRequests />} /></Route>
         </Route></Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
