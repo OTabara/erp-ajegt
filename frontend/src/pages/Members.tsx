@@ -1,36 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
+import { ApiError, createMember, fetchMembers, setMemberStatus, updateMember } from "../api/members";
+import type { Member, MemberDraft } from "../api/members";
 
-type MemberStatus = "active" | "archived";
-
-type Member = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  role: string;
-  joinedAt: string;
-  status: MemberStatus;
-};
-
-type MemberDraft = Omit<Member, "id" | "status">;
-
-const STORAGE_KEY = "ajegt-erp-members-v1";
 const roles = ["Membre", "Présidence", "Secrétariat", "Trésorerie", "Bureau"];
 const filters = [
   { id: "active", label: "Membres actifs" },
   { id: "archived", label: "Archivés" },
   { id: "all", label: "Tous" },
 ] as const;
-
-const demoMembers: Member[] = [
-  { id: "demo-1", firstName: "Aïssatou", lastName: "Camara", email: "aissatou.camara@example.org", phone: "+33 6 00 00 00 01", role: "Présidence", joinedAt: "2024-09-12", status: "active" },
-  { id: "demo-2", firstName: "Mamadou", lastName: "Bah", email: "mamadou.bah@example.org", phone: "+33 6 00 00 00 02", role: "Trésorerie", joinedAt: "2024-10-03", status: "active" },
-  { id: "demo-3", firstName: "Fatoumata", lastName: "Diallo", email: "fatoumata.diallo@example.org", phone: "+33 6 00 00 00 03", role: "Secrétariat", joinedAt: "2025-01-18", status: "active" },
-  { id: "demo-4", firstName: "Ibrahima", lastName: "Barry", email: "ibrahima.barry@example.org", phone: "+33 6 00 00 00 04", role: "Membre", joinedAt: `${new Date().getFullYear()}-03-06`, status: "active" },
-  { id: "demo-5", firstName: "Mariama", lastName: "Soumah", email: "mariama.soumah@example.org", phone: "+33 6 00 00 00 05", role: "Membre", joinedAt: "2024-11-22", status: "archived" },
-];
 
 const emptyDraft: MemberDraft = {
   firstName: "",
@@ -40,33 +18,6 @@ const emptyDraft: MemberDraft = {
   role: "Membre",
   joinedAt: new Date().toISOString().slice(0, 10),
 };
-
-function loadMembers(): Member[] {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved === null) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(demoMembers));
-      return demoMembers;
-    }
-    const parsed: unknown = JSON.parse(saved);
-    return Array.isArray(parsed) ? parsed.filter(isMember) : demoMembers;
-  } catch {
-    return demoMembers;
-  }
-}
-
-function isMember(value: unknown): value is Member {
-  if (!value || typeof value !== "object") return false;
-  const member = value as Partial<Member>;
-  return typeof member.id === "string"
-    && typeof member.firstName === "string"
-    && typeof member.lastName === "string"
-    && typeof member.email === "string"
-    && typeof member.phone === "string"
-    && typeof member.role === "string"
-    && typeof member.joinedAt === "string"
-    && (member.status === "active" || member.status === "archived");
-}
 
 function initials(member: Pick<Member, "firstName" | "lastName">) {
   return `${member.firstName.trim().charAt(0)}${member.lastName.trim().charAt(0)}`.toLocaleUpperCase("fr-FR");
@@ -79,7 +30,9 @@ function formatDate(value: string) {
 
 export default function Members() {
   const [members, setMembers] = useState<Member[]>([]);
-  const [ready, setReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [pageError, setPageError] = useState("");
   const [filter, setFilter] = useState<(typeof filters)[number]["id"]>("active");
   const [query, setQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -88,13 +41,13 @@ export default function Members() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    setMembers(loadMembers());
-    setReady(true);
+    let cancelled = false;
+    fetchMembers()
+      .then((loadedMembers) => { if (!cancelled) setMembers(loadedMembers); })
+      .catch((cause: unknown) => { if (!cancelled) setPageError(cause instanceof Error ? cause.message : "Le chargement des membres a échoué."); })
+      .finally(() => { if (!cancelled) setIsLoading(false); });
+    return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => {
-    if (ready) localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
-  }, [members, ready]);
 
   useEffect(() => {
     if (!isModalOpen) return;
@@ -144,7 +97,19 @@ export default function Members() {
     setError("");
   }
 
-  function saveMember(event: FormEvent<HTMLFormElement>) {
+  async function retryLoading() {
+    setIsLoading(true);
+    setPageError("");
+    try {
+      setMembers(await fetchMembers());
+    } catch (cause: unknown) {
+      setPageError(cause instanceof Error ? cause.message : "Le chargement des membres a échoué.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function saveMember(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const normalizedEmail = draft.email.trim().toLocaleLowerCase("fr-FR");
     if (members.some((member) => member.email.toLocaleLowerCase("fr-FR") === normalizedEmail && member.id !== editingId)) {
@@ -160,18 +125,30 @@ export default function Members() {
       phone: draft.phone.trim(),
     };
 
-    if (editingId) {
-      setMembers((current) => current.map((member) => member.id === editingId ? { ...member, ...normalizedDraft } : member));
-    } else {
-      setMembers((current) => [{ id: crypto.randomUUID(), ...normalizedDraft, status: "active" }, ...current]);
+    setIsSaving(true);
+    setPageError("");
+    try {
+      const saved = editingId ? await updateMember(editingId, normalizedDraft) : await createMember(normalizedDraft);
+      setMembers((current) => editingId
+        ? current.map((member) => member.id === saved.id ? saved : member)
+        : [saved, ...current]);
+      closeModal();
+    } catch (cause: unknown) {
+      const message = cause instanceof ApiError ? cause.message : "L’enregistrement du membre a échoué.";
+      setError(message);
+    } finally {
+      setIsSaving(false);
     }
-    closeModal();
   }
 
-  function toggleArchive(member: Member) {
-    setMembers((current) => current.map((item) => item.id === member.id
-      ? { ...item, status: item.status === "active" ? "archived" : "active" }
-      : item));
+  async function toggleArchive(member: Member) {
+    setPageError("");
+    try {
+      const updated = await setMemberStatus(member.id, member.status === "active" ? "archived" : "active");
+      setMembers((current) => current.map((item) => item.id === updated.id ? updated : item));
+    } catch (cause: unknown) {
+      setPageError(cause instanceof Error ? cause.message : "La modification du statut a échoué.");
+    }
   }
 
   return (
@@ -189,8 +166,17 @@ export default function Members() {
 
       <div className="prototype-banner" role="note">
         <span className="prototype-banner-icon" aria-hidden="true">i</span>
-        <span><strong>Mode prototype</strong> — ces exemples sont fictifs et vos modifications restent dans ce navigateur.</span>
+        <span><strong>Mode prototype</strong> — données de démonstration stockées localement. N’utilisez pas de données personnelles réelles.</span>
       </div>
+
+      {pageError && (
+        <div className="page-error" role="alert">
+          <span>{pageError}</span>
+          <button className="button button-secondary" onClick={() => { void retryLoading(); }} disabled={isLoading}>
+            {isLoading ? "Connexion…" : "Réessayer"}
+          </button>
+        </div>
+      )}
 
       <section className="member-stats" aria-label="Résumé des membres">
         <div className="stat-card">
@@ -239,7 +225,8 @@ export default function Members() {
           <table className="members-table">
             <thead><tr><th scope="col">Membre</th><th scope="col">Rôle</th><th scope="col">Contact</th><th scope="col">Adhésion</th><th scope="col">Statut</th><th scope="col"><span className="sr-only">Actions</span></th></tr></thead>
             <tbody>
-              {displayedMembers.map((member) => (
+              {isLoading && <tr><td colSpan={6}><div className="empty-state"><strong>Chargement des membres…</strong></div></td></tr>}
+              {!isLoading && displayedMembers.map((member) => (
                 <tr key={member.id}>
                   <td data-label="Membre">
                     <div className="member-identity">
@@ -259,13 +246,13 @@ export default function Members() {
                   </td>
                 </tr>
               ))}
-              {displayedMembers.length === 0 && (
+              {!isLoading && displayedMembers.length === 0 && (
                 <tr><td colSpan={6}><div className="empty-state"><span aria-hidden="true">♙</span><strong>{query ? "Aucun résultat" : "Aucun membre dans cette liste"}</strong><p>{query ? "Essayez un autre nom, e-mail ou rôle." : "Ajoutez un membre pour commencer à constituer l’annuaire."}</p>{!query && <button className="button button-secondary" onClick={openCreateModal}>Ajouter un membre</button>}</div></td></tr>
               )}
             </tbody>
           </table>
         </div>
-        <div className="table-footer"><span>{displayedMembers.length} membre{displayedMembers.length > 1 ? "s" : ""} affiché{displayedMembers.length > 1 ? "s" : ""}</span><span>Les exemples utilisent des adresses fictives.</span></div>
+        <div className="table-footer"><span>{displayedMembers.length} membre{displayedMembers.length > 1 ? "s" : ""} affiché{displayedMembers.length > 1 ? "s" : ""}</span><span>Environnement de démonstration local</span></div>
       </section>
 
       {isModalOpen && (
@@ -276,7 +263,7 @@ export default function Members() {
               <button className="icon-action modal-close" onClick={closeModal} aria-label="Fermer">×</button>
             </div>
             <p className="modal-intro">Renseignez les informations principales du membre.</p>
-            <form onSubmit={saveMember}>
+            <form onSubmit={(event) => { void saveMember(event); }}>
               <div className="form-grid">
                 <label>Prénom<input autoFocus required maxLength={80} value={draft.firstName} onChange={(event) => setDraft({ ...draft, firstName: event.target.value })} placeholder="Ex. Aïssatou" /></label>
                 <label>Nom<input required maxLength={80} value={draft.lastName} onChange={(event) => setDraft({ ...draft, lastName: event.target.value })} placeholder="Ex. Camara" /></label>
@@ -286,7 +273,7 @@ export default function Members() {
                 <label>Date d’adhésion<input required type="date" value={draft.joinedAt} onChange={(event) => setDraft({ ...draft, joinedAt: event.target.value })} /></label>
               </div>
               {error && <p className="form-error" role="alert">{error}</p>}
-              <div className="modal-actions"><button type="button" className="button button-secondary" onClick={closeModal}>Annuler</button><button type="submit" className="button button-primary">{editingId ? "Enregistrer les changements" : "Ajouter le membre"}</button></div>
+              <div className="modal-actions"><button type="button" className="button button-secondary" onClick={closeModal} disabled={isSaving}>Annuler</button><button type="submit" className="button button-primary" disabled={isSaving}>{isSaving ? "Enregistrement…" : editingId ? "Enregistrer les changements" : "Ajouter le membre"}</button></div>
             </form>
           </section>
         </div>
